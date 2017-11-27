@@ -1,10 +1,21 @@
-"use strict";
 /*!
  * elasticlunr.DocumentStore
  * Copyright (C) @YEAR Wei Song
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-var DocumentStore = /** @class */ (function () {
+export declare type DocRef = number | string;
+export interface SerialisedData {
+    docs: any;
+    length: number;
+    docInfo: any;
+    save: boolean;
+}
+export declare class DocumentStore<T extends any> {
+    private _save;
+    docs: {
+        [index: string]: T;
+    };
+    docInfo: any;
+    length: number;
     /**
      * elasticlunr.DocumentStore is a simple key-value document store used for storing sets of tokens for
      * documents stored in index.
@@ -19,40 +30,20 @@ var DocumentStore = /** @class */ (function () {
      * @constructor
      * @module
      */
-    function DocumentStore(save) {
-        if (save === null || save === undefined) {
-            this._save = true;
-        }
-        else {
-            this._save = save;
-        }
-        this.docs = {};
-        this.docInfo = {};
-        this.length = 0;
-    }
+    constructor(save?: boolean);
     /**
      * Loads a previously serialised document store
      *
      * @param {Object} serialisedData The serialised document store to load.
      * @return {DocumentStore}
      */
-    DocumentStore.load = function (serialisedData) {
-        var store = new DocumentStore();
-        store.length = serialisedData.length;
-        store.docs = serialisedData.docs;
-        store.docInfo = serialisedData.docInfo;
-        store._save = serialisedData.save;
-        return store;
-    };
+    static load(serialisedData: SerialisedData): DocumentStore<{}>;
     /**
      * check if current instance store the original doc
      *
      * @return {Boolean}
      */
-    DocumentStore.prototype.isDocStored = function () {
-        return this._save;
-    };
-    ;
+    isDocStored(): boolean;
     /**
      * Stores the given doc in the document store against the given id.
      * If docRef already exist, then update doc.
@@ -62,17 +53,7 @@ var DocumentStore = /** @class */ (function () {
      * @param {Integer|String} docRef The key used to store the JSON format doc.
      * @param {Object} doc The JSON format doc.
      */
-    DocumentStore.prototype.addDoc = function (docRef, doc) {
-        if (!this.hasDoc(docRef))
-            this.length++;
-        if (this._save === true) {
-            this.docs[docRef] = clone(doc);
-        }
-        else {
-            this.docs[docRef] = null;
-        }
-    };
-    ;
+    addDoc(docRef: DocRef, doc: any): void;
     /**
      * Retrieves the JSON doc from the document store for a given key.
      *
@@ -83,12 +64,7 @@ var DocumentStore = /** @class */ (function () {
      * @return {Object}
      * @memberOf DocumentStore
      */
-    DocumentStore.prototype.getDoc = function (docRef) {
-        if (this.hasDoc(docRef) === false)
-            return null;
-        return this.docs[docRef];
-    };
-    ;
+    getDoc(docRef: DocRef): T;
     /**
      * Checks whether the document store contains a key (docRef).
      *
@@ -96,22 +72,14 @@ var DocumentStore = /** @class */ (function () {
      * @return {Boolean}
      * @memberOf DocumentStore
      */
-    DocumentStore.prototype.hasDoc = function (docRef) {
-        return docRef in this.docs;
-    };
+    hasDoc(docRef: DocRef): boolean;
     /**
      * Removes the value for a key in the document store.
      *
      * @param {Integer|String} docRef The id to remove from the document store.
      * @memberOf DocumentStore
      */
-    DocumentStore.prototype.removeDoc = function (docRef) {
-        if (!this.hasDoc(docRef))
-            return;
-        delete this.docs[docRef];
-        delete this.docInfo[docRef];
-        this.length--;
-    };
+    removeDoc(docRef: DocRef): void;
     /**
      * Add field length of a document's field tokens from pipeline results.
      * The field length of a document is used to do field length normalization even without the original JSON document stored.
@@ -120,15 +88,7 @@ var DocumentStore = /** @class */ (function () {
      * @param {String} fieldName field name
      * @param {Integer} length field length
      */
-    DocumentStore.prototype.addFieldLength = function (docRef, fieldName, length) {
-        if (docRef === null || docRef === undefined)
-            return;
-        if (this.hasDoc(docRef) == false)
-            return;
-        if (!this.docInfo[docRef])
-            this.docInfo[docRef] = {};
-        this.docInfo[docRef][fieldName] = length;
-    };
+    addFieldLength(docRef: DocRef, fieldName: string, length: number): void;
     /**
      * Update field length of a document's field tokens from pipeline results.
      * The field length of a document is used to do field length normalization even without the original JSON document stored.
@@ -137,13 +97,7 @@ var DocumentStore = /** @class */ (function () {
      * @param {String} fieldName field name
      * @param {Integer} length field length
      */
-    DocumentStore.prototype.updateFieldLength = function (docRef, fieldName, length) {
-        if (docRef === null || docRef === undefined)
-            return;
-        if (this.hasDoc(docRef) == false)
-            return;
-        this.addFieldLength(docRef, fieldName, length);
-    };
+    updateFieldLength(docRef?: DocRef, fieldName?: string, length?: number): void;
     /**
      * get field length of a document by docRef
      *
@@ -151,45 +105,19 @@ var DocumentStore = /** @class */ (function () {
      * @param {String} fieldName field name
      * @return {Integer} field length
      */
-    DocumentStore.prototype.getFieldLength = function (docRef, fieldName) {
-        if (docRef === null || docRef === undefined)
-            return 0;
-        if (!(docRef in this.docs))
-            return 0;
-        if (!(fieldName in this.docInfo[docRef]))
-            return 0;
-        return this.docInfo[docRef][fieldName];
-    };
+    getFieldLength(docRef?: DocRef, fieldName?: string): any;
     /**
      * Returns a JSON representation of the document store used for serialisation.
      *
      * @return {Object} JSON format
      * @memberOf DocumentStore
      */
-    DocumentStore.prototype.toJSON = function () {
-        return {
-            docs: this.docs,
-            docInfo: this.docInfo,
-            length: this.length,
-            save: this._save
+    toJSON(): {
+        docs: {
+            [index: string]: T;
         };
+        docInfo: any;
+        length: number;
+        save: boolean;
     };
-    return DocumentStore;
-}());
-exports.DocumentStore = DocumentStore;
-/**
- * Cloning object
- *
- * @param {Object} object in JSON format
- * @return {Object} copied object
- */
-function clone(obj) {
-    if (null === obj || "object" !== typeof obj)
-        return obj;
-    var copy = obj.constructor();
-    for (var attr in obj) {
-        if (obj.hasOwnProperty(attr))
-            copy[attr] = obj[attr];
-    }
-    return copy;
 }

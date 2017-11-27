@@ -24,10 +24,12 @@ NODE ?= /usr/bin/node
 NPM ?= /usr/bin/npm
 PHANTOMJS ?= ./node_modules/.bin/phantomjs
 UGLIFYJS ?= ./node_modules/.bin/uglifyjs
+TSC ?= ./node_modules/.bin/tsc
 
 all: node_modules elasticlunr.js elasticlunr.min.js docs bower.json package.json component.json example
 
 elasticlunr.js: $(SRC)
+	${TSC} -p .
 	cat build/wrapper_start $^ build/wrapper_end | \
 	sed "s/@YEAR/${YEAR}/" | \
 	sed "s/@VERSION/${VERSION}/" > $@
@@ -35,6 +37,7 @@ elasticlunr.js: $(SRC)
 	cp $@ ./example/
 
 elasticlunr.min.js: $(SRC)
+	${TSC} -p .
 	cat build/wrapper_start $^ build/wrapper_end | \
 	sed "s/@YEAR/${YEAR}/" | \
 	sed "s/@VERSION/${VERSION}/" | \
@@ -58,6 +61,7 @@ docs: node_modules
 	${DOXX} --source lib --target docs
 
 clean:
+	rm -rf lib/*.js
 	rm -f elasticlunr.js
 	rm -f elasticlunr.min.js
 	rm -f *.json

@@ -1,11 +1,8 @@
-"use strict";
 /*!
  * elasticlunr.trimmer
  * Copyright (C) @YEAR Oliver Nightingale
  * Copyright (C) @YEAR Wei Song
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-var pipeline_1 = require("./pipeline");
 /**
  * elasticlunr.trimmer is a pipeline function for trimming non word
  * characters from the begining and end of tokens before they
@@ -20,12 +17,4 @@ var pipeline_1 = require("./pipeline");
  * @return {String}
  * @see elasticlunr.Pipeline
  */
-exports.trimmer = function (token) {
-    if (token === null || token === undefined) {
-        throw new Error('token should not be undefined');
-    }
-    return token
-        .replace(/^\W+/, '')
-        .replace(/\W+$/, '');
-};
-pipeline_1.Pipeline.registerFunction(exports.trimmer, 'trimmer');
+export declare const trimmer: (token: string) => string;

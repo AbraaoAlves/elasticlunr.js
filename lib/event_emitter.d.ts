@@ -1,11 +1,12 @@
-"use strict";
 /*!
  * elasticlunr.EventEmitter
  * Copyright (C) @YEAR Oliver Nightingale
  * Copyright (C) @YEAR Wei Song
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-var EventEmitter = /** @class */ (function () {
+export declare class EventEmitter {
+    events: {
+        [eventName: string]: Function[];
+    };
     /**
      * elasticlunr.EventEmitter is an event emitter for elasticlunr.
      * It manages adding and removing event handlers and triggering events and their handlers.
@@ -15,10 +16,7 @@ var EventEmitter = /** @class */ (function () {
      *
      * @constructor
      */
-    function EventEmitter() {
-        this.events = {};
-    }
-    ;
+    constructor();
     /**
      * Binds a handler function to a specific event(s).
      *
@@ -28,16 +26,7 @@ var EventEmitter = /** @class */ (function () {
      * @param {Function} fn The function to call when an event is fired.
      * @memberOf EventEmitter
      */
-    EventEmitter.prototype.addListener = function () {
-        var args = Array.prototype.slice.call(arguments), fn = args.pop(), names = args;
-        if (typeof fn !== "function")
-            throw new TypeError("last argument must be a function");
-        names.forEach(function (name) {
-            if (!this.hasHandler(name))
-                this.events[name] = [];
-            this.events[name].push(fn);
-        }, this);
-    };
+    addListener(): void;
     /**
      * Removes a handler function from a specific event.
      *
@@ -45,16 +34,7 @@ var EventEmitter = /** @class */ (function () {
      * @param {Function} fn The function to remove from an event.
      * @memberOf EventEmitter
      */
-    EventEmitter.prototype.removeListener = function (name, fn) {
-        if (!this.hasHandler(name))
-            return;
-        var fnIndex = this.events[name].indexOf(fn);
-        if (fnIndex === -1)
-            return;
-        this.events[name].splice(fnIndex, 1);
-        if (this.events[name].length == 0)
-            delete this.events[name];
-    };
+    removeListener(name: string, fn: Function): void;
     /**
      * Call all functions that bounded to the given event.
      *
@@ -64,14 +44,7 @@ var EventEmitter = /** @class */ (function () {
      * @param {String} eventName The name of the event to emit.
      * @memberOf EventEmitter
      */
-    EventEmitter.prototype.emit = function (name) {
-        if (!this.hasHandler(name))
-            return;
-        var args = Array.prototype.slice.call(arguments, 1);
-        this.events[name].forEach(function (fn) {
-            fn.apply(undefined, args);
-        }, this);
-    };
+    emit(name: string): void;
     /**
      * Checks whether a handler has ever been stored against an event.
      *
@@ -79,9 +52,5 @@ var EventEmitter = /** @class */ (function () {
      * @private
      * @memberOf EventEmitter
      */
-    EventEmitter.prototype.hasHandler = function (name) {
-        return name in this.events;
-    };
-    return EventEmitter;
-}());
-exports.EventEmitter = EventEmitter;
+    hasHandler(name: string): boolean;
+}

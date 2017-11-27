@@ -1,12 +1,10 @@
-"use strict";
 /*!
  * elasticlunr.Pipeline
  * Copyright (C) @YEAR Oliver Nightingale
  * Copyright (C) @YEAR Wei Song
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-var utils_1 = require("./utils");
-var Pipeline = /** @class */ (function () {
+export declare class Pipeline {
+    _queue: any[];
     /**
      * elasticlunr.Pipelines maintain an ordered list of functions to be applied to
      * both documents tokens and query tokens.
@@ -33,9 +31,8 @@ var Pipeline = /** @class */ (function () {
      *
      * @constructor
      */
-    function Pipeline() {
-        this._queue = [];
-    }
+    constructor();
+    static registeredFunctions: {};
     /**
      * Register a function in the pipeline.
      *
@@ -49,13 +46,7 @@ var Pipeline = /** @class */ (function () {
      * @param {String} label The label to register this function with
      * @memberOf Pipeline
      */
-    Pipeline.registerFunction = function (fn, label) {
-        if (label in Pipeline.registeredFunctions) {
-            utils_1.utils.warn('Overwriting existing registered function: ' + label);
-        }
-        fn.label = label;
-        Pipeline.registeredFunctions[label] = fn;
-    };
+    static registerFunction(fn: Function, label: string): void;
     /**
      * Get a registered function in the pipeline.
      *
@@ -63,12 +54,7 @@ var Pipeline = /** @class */ (function () {
      * @return {Function}
      * @memberOf Pipeline
      */
-    Pipeline.getRegisteredFunction = function (label) {
-        if ((label in Pipeline.registeredFunctions) !== true) {
-            return null;
-        }
-        return Pipeline.registeredFunctions[label];
-    };
+    static getRegisteredFunction(label: string): any;
     /**
      * Warns if the function is not registered as a Pipeline function.
      *
@@ -76,12 +62,7 @@ var Pipeline = /** @class */ (function () {
      * @private
      * @memberOf Pipeline
      */
-    Pipeline.warnIfFunctionNotRegistered = function (fn) {
-        var isRegistered = fn.label && (fn.label in this.registeredFunctions);
-        if (!isRegistered) {
-            utils_1.utils.warn('Function is not registered with pipeline. This may cause problems when serialising the index.\n', fn);
-        }
-    };
+    static warnIfFunctionNotRegistered(fn: Function): void;
     /**
      * Loads a previously serialised pipeline.
      *
@@ -93,19 +74,7 @@ var Pipeline = /** @class */ (function () {
      * @return {elasticlunr.Pipeline}
      * @memberOf Pipeline
      */
-    Pipeline.load = function (serialised) {
-        var pipeline = new Pipeline();
-        serialised.forEach(function (fnName) {
-            var fn = Pipeline.getRegisteredFunction(fnName);
-            if (fn) {
-                pipeline.add(fn);
-            }
-            else {
-                throw new Error('Cannot load un-registered function: ' + fnName);
-            }
-        });
-        return pipeline;
-    };
+    static load(serialised: any[]): Pipeline;
     /**
      * Adds new functions to the end of the pipeline.
      *
@@ -114,16 +83,7 @@ var Pipeline = /** @class */ (function () {
      * @param {Function} functions Any number of functions to add to the pipeline.
      * @memberOf Pipeline
      */
-    Pipeline.prototype.add = function () {
-        var fns = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            fns[_i] = arguments[_i];
-        }
-        fns.forEach(function (fn) {
-            Pipeline.warnIfFunctionNotRegistered(fn);
-            this._queue.push(fn);
-        }, this);
-    };
+    add(...fns: Function[]): void;
     /**
      * Adds a single function after a function that already exists in the
      * pipeline.
@@ -135,14 +95,7 @@ var Pipeline = /** @class */ (function () {
      * @param {Function} newFn The new function to add to the pipeline.
      * @memberOf Pipeline
      */
-    Pipeline.prototype.after = function (existingFn, newFn) {
-        Pipeline.warnIfFunctionNotRegistered(newFn);
-        var pos = this._queue.indexOf(existingFn);
-        if (pos === -1) {
-            throw new Error('Cannot find existingFn');
-        }
-        this._queue.splice(pos + 1, 0, newFn);
-    };
+    after(existingFn: Function, newFn: Function): void;
     /**
      * Adds a single function before a function that already exists in the
      * pipeline.
@@ -154,27 +107,14 @@ var Pipeline = /** @class */ (function () {
      * @param {Function} newFn The new function to add to the pipeline.
      * @memberOf Pipeline
      */
-    Pipeline.prototype.before = function (existingFn, newFn) {
-        Pipeline.warnIfFunctionNotRegistered(newFn);
-        var pos = this._queue.indexOf(existingFn);
-        if (pos === -1) {
-            throw new Error('Cannot find existingFn');
-        }
-        this._queue.splice(pos, 0, newFn);
-    };
+    before(existingFn: Function, newFn: Function): void;
     /**
      * Removes a function from the pipeline.
      *
      * @param {Function} fn The function to remove from the pipeline.
      * @memberOf Pipeline
      */
-    Pipeline.prototype.remove = function (fn) {
-        var pos = this._queue.indexOf(fn);
-        if (pos === -1) {
-            return;
-        }
-        this._queue.splice(pos, 1);
-    };
+    remove(fn: Function): void;
     /**
      * Runs the current list of functions that registered in the pipeline against the
      * input tokens.
@@ -183,37 +123,19 @@ var Pipeline = /** @class */ (function () {
      * @return {Array}
      * @memberOf Pipeline
      */
-    Pipeline.prototype.run = function (tokens) {
-        var out = [], tokenLength = tokens.length, pipelineLength = this._queue.length;
-        for (var i = 0; i < tokenLength; i++) {
-            var token = tokens[i];
-            for (var j = 0; j < pipelineLength; j++) {
-                token = this._queue[j](token, i, tokens);
-                if (token === void 0 || token === null)
-                    break;
-            }
-            ;
-            if (token !== void 0 && token !== null)
-                out.push(token);
-        }
-        return out;
-    };
+    run(tokens: string[]): string[];
     /**
      * Resets the pipeline by removing any existing processors.
      *
      * @memberOf Pipeline
      */
-    Pipeline.prototype.reset = function () {
-        this._queue = [];
-    };
+    reset(): void;
     /**
      * Get the pipeline if user want to check the pipeline.
      *
      * @memberOf Pipeline
      */
-    Pipeline.prototype.get = function () {
-        return this._queue;
-    };
+    get(): any[];
     /**
      * Returns a representation of the pipeline ready for serialisation.
      * Only serialize pipeline function's name. Not storing function, so when
@@ -225,13 +147,5 @@ var Pipeline = /** @class */ (function () {
      * @return {Array}
      * @memberOf Pipeline
      */
-    Pipeline.prototype.toJSON = function () {
-        return this._queue.map(function (fn) {
-            Pipeline.warnIfFunctionNotRegistered(fn);
-            return fn.label;
-        });
-    };
-    Pipeline.registeredFunctions = {};
-    return Pipeline;
-}());
-exports.Pipeline = Pipeline;
+    toJSON(): string[];
+}

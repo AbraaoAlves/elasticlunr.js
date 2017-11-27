@@ -1,15 +1,10 @@
-"use strict";
 /*!
  * elasticlunr.js
  * Copyright (C) @YEAR Oliver Nightingale
  * Copyright (C) @YEAR Wei Song
  * Copyright (C) @YEAR Abraão Alves
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-var indexr_1 = require("./indexr");
-var trimmer_1 = require("./trimmer");
-var stop_word_filter_1 = require("./stop_word_filter");
-var stemmer_1 = require("./stemmer");
+import { Index } from './indexr';
 /**
  * Convenience function for instantiating a new elasticlunr index and configuring it
  * with the default pipeline functions and the passed config function.
@@ -63,10 +58,4 @@ var stemmer_1 = require("./stemmer");
  * @return {elasticlunr.Index}
  *
  */
-exports.init = function (config) {
-    var idx = new indexr_1.Index();
-    idx.pipeline.add(trimmer_1.trimmer, stop_word_filter_1.stopWordFilter, stemmer_1.stemmer);
-    if (config)
-        config.call(idx, idx);
-    return idx;
-};
+export declare const init: (config: Function) => Index;
